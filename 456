@@ -1,0 +1,557 @@
+-- โค้ดสคริปต์ Lucky Block by Axom (Tabs & Local Player Edition)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- ป้องกันการรันซ้ำ
+if CoreGui:FindFirstChild("AxomLuckyBlockUI") then
+    CoreGui.AxomLuckyBlockUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AxomLuckyBlockUI"
+ScreenGui.Parent = CoreGui
+
+-- UI หลัก
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 260, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -130, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+MainFrame.Parent = ScreenGui
+
+-- ฟังก์ชันทำตัวหนังสือเป็นสีรุ้ง
+local function applyRainbow(textLabel)
+    RunService.RenderStepped:Connect(function()
+        if textLabel and textLabel.Parent then
+            local hue = (tick() % 5) / 5
+            textLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+        end
+    end)
+end
+
+-- หัวข้อ UI ด้านบน
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 25)
+TitleLabel.Position = UDim2.new(0, 0, 0, 3)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "script Spawn lucky block/ by Axom"
+TitleLabel.TextScaled = true
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Parent = MainFrame
+applyRainbow(TitleLabel)
+
+-- ปุ่มสลับแท็บ (Tab Buttons)
+local TabMainBtn = Instance.new("TextButton")
+TabMainBtn.Size = UDim2.new(0, 120, 0, 25)
+TabMainBtn.Position = UDim2.new(0, 10, 0, 32)
+TabMainBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TabMainBtn.BorderSizePixel = 1
+TabMainBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+TabMainBtn.Text = "Main"
+TabMainBtn.TextScaled = true
+TabMainBtn.Font = Enum.Font.SourceSansBold
+TabMainBtn.Parent = MainFrame
+applyRainbow(TabMainBtn)
+
+local TabPlayerBtn = Instance.new("TextButton")
+TabPlayerBtn.Size = UDim2.new(0, 120, 0, 25)
+TabPlayerBtn.Position = UDim2.new(0, 130, 0, 32)
+TabPlayerBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TabPlayerBtn.BorderSizePixel = 1
+TabPlayerBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+TabPlayerBtn.Text = "Local Player"
+TabPlayerBtn.TextScaled = true
+TabPlayerBtn.Font = Enum.Font.SourceSansBold
+TabPlayerBtn.Parent = MainFrame
+applyRainbow(TabPlayerBtn)
+
+-- คอนเทนเนอร์แท็บ Main
+local ContainerMain = Instance.new("Frame")
+ContainerMain.Size = UDim2.new(1, 0, 1, -95)
+ContainerMain.Position = UDim2.new(0, 0, 0, 62)
+ContainerMain.BackgroundTransparency = 1
+ContainerMain.Visible = true
+ContainerMain.Parent = MainFrame
+
+-- คอนเทนเนอร์แท็บ Local Player
+local ContainerPlayer = Instance.new("Frame")
+ContainerPlayer.Size = UDim2.new(1, 0, 1, -95)
+ContainerPlayer.Position = UDim2.new(0, 0, 0, 62)
+ContainerPlayer.BackgroundTransparency = 1
+ContainerPlayer.Visible = false
+ContainerPlayer.Parent = MainFrame
+
+-- ระบบสลับแท็บ
+TabMainBtn.MouseButton1Click:Connect(function()
+    ContainerMain.Visible = true
+    ContainerPlayer.Visible = false
+    TabMainBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    TabPlayerBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+end)
+
+TabPlayerBtn.MouseButton1Click:Connect(function()
+    ContainerMain.Visible = false
+    ContainerPlayer.Visible = true
+    TabMainBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    TabPlayerBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+end)
+
+----------------------------------------------------
+-- เนื้อหาในแท็บ MAIN
+----------------------------------------------------
+
+-- ปุ่มกด Spawn Lucky Block (ครั้งเดียว)
+local SpawnButton = Instance.new("TextButton")
+SpawnButton.Size = UDim2.new(0, 220, 0, 30)
+SpawnButton.Position = UDim2.new(0.5, -110, 0, 5)
+SpawnButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SpawnButton.BorderSizePixel = 1
+SpawnButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+SpawnButton.Text = "Spawn"
+SpawnButton.TextScaled = true
+SpawnButton.Font = Enum.Font.SourceSansBold
+SpawnButton.Parent = ContainerMain
+applyRainbow(SpawnButton)
+
+SpawnButton.MouseButton1Click:Connect(function()
+    pcall(function()
+        ReplicatedStorage:WaitForChild("SpawnLuckyBlock"):FireServer()
+    end)
+end)
+
+-- ปุ่ม Auto Spawn Lucky Block (เสกของรัวๆ ออโต้ ON/OFF)
+local AutoSpawnBtn = Instance.new("TextButton")
+AutoSpawnBtn.Size = UDim2.new(0, 220, 0, 30)
+AutoSpawnBtn.Position = UDim2.new(0.5, -110, 0, 40)
+AutoSpawnBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+AutoSpawnBtn.BorderSizePixel = 1
+AutoSpawnBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+AutoSpawnBtn.Text = "Auto Spawn: OFF"
+AutoSpawnBtn.TextScaled = true
+AutoSpawnBtn.Font = Enum.Font.SourceSansBold
+AutoSpawnBtn.Parent = ContainerMain
+applyRainbow(AutoSpawnBtn)
+
+local autoSpawnActive = false
+AutoSpawnBtn.MouseButton1Click:Connect(function()
+    autoSpawnActive = not autoSpawnActive
+    AutoSpawnBtn.Text = autoSpawnActive and "Auto Spawn: ON" or "Auto Spawn: OFF"
+end)
+
+task.spawn(function()
+    while true do
+        if autoSpawnActive then
+            pcall(function()
+                ReplicatedStorage:WaitForChild("SpawnLuckyBlock"):FireServer()
+            end)
+            task.wait(0.2)
+        else
+            task.wait(0.5)
+        end
+    end
+end)
+
+-- ปุ่ม Rainbow ESP (เปิด/ปิด)
+local EspBtn = Instance.new("TextButton")
+EspBtn.Size = UDim2.new(0, 220, 0, 30)
+EspBtn.Position = UDim2.new(0.5, -110, 0, 75)
+EspBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+EspBtn.BorderSizePixel = 1
+EspBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+EspBtn.Text = "Rainbow ESP: OFF"
+EspBtn.TextScaled = true
+EspBtn.Font = Enum.Font.SourceSansBold
+EspBtn.Parent = ContainerMain
+applyRainbow(EspBtn)
+
+local espActive = false
+local highlights = {}
+
+EspBtn.MouseButton1Click:Connect(function()
+    espActive = not espActive
+    EspBtn.Text = espActive and "Rainbow ESP: ON" or "Rainbow ESP: OFF"
+    if not espActive then
+        for _, hl in pairs(highlights) do
+            if hl then hl:Destroy() end
+        end
+        highlights = {}
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    local hue = (tick() % 5) / 5
+    local currentRainbowColor = Color3.fromHSV(hue, 1, 1)
+
+    if espActive then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local char = player.Character
+                if not char:FindFirstChild("AxomHighlight") then
+                    local hl = Instance.new("Highlight")
+                    hl.Name = "AxomHighlight"
+                    hl.Adornee = char
+                    hl.Parent = char
+                    hl.FillTransparency = 0.5
+                    hl.OutlineTransparency = 0
+                    highlights[player] = hl
+                end
+                local hl = highlights[player]
+                if hl then
+                    hl.FillColor = currentRainbowColor
+                    hl.OutlineColor = currentRainbowColor
+                end
+            end
+        end
+    else
+        for player, hl in pairs(highlights) do
+            if hl then hl:Destroy() end
+        end
+        highlights = {}
+    end
+end)
+
+-- ปุ่ม Hitbox Toggle (เปิด/ปิด)
+local HitboxBtn = Instance.new("TextButton")
+HitboxBtn.Size = UDim2.new(0, 220, 0, 30)
+HitboxBtn.Position = UDim2.new(0.5, -110, 0, 110)
+HitboxBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+HitboxBtn.BorderSizePixel = 1
+HitboxBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+HitboxBtn.Text = "Hitbox: OFF"
+HitboxBtn.TextScaled = true
+HitboxBtn.Font = Enum.Font.SourceSansBold
+HitboxBtn.Parent = ContainerMain
+applyRainbow(HitboxBtn)
+
+local hitboxActive = false
+HitboxBtn.MouseButton1Click:Connect(function()
+    hitboxActive = not hitboxActive
+    HitboxBtn.Text = hitboxActive and "Hitbox: ON" or "Hitbox: OFF"
+    if not hitboxActive then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = player.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(2, 2, 1)
+                hrp.Transparency = 1
+                hrp.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- แสดงขนาด Hitbox ปัจจุบัน
+local HitboxSizeLabel = Instance.new("TextLabel")
+HitboxSizeLabel.Size = UDim2.new(0, 220, 0, 20)
+HitboxSizeLabel.Position = UDim2.new(0.5, -110, 0, 145)
+HitboxSizeLabel.BackgroundTransparency = 1
+HitboxSizeLabel.Text = "Hitbox Size: 5"
+HitboxSizeLabel.TextScaled = true
+HitboxSizeLabel.Font = Enum.Font.SourceSansBold
+HitboxSizeLabel.Parent = ContainerMain
+applyRainbow(HitboxSizeLabel)
+
+local hitboxSize = 5
+
+-- ฟังก์ชันทำปุ่มกดค้าง (Hold-to-Repeat)
+local function setupHoldButton(button, action)
+    local holding = false
+    button.MouseButton1Down:Connect(function()
+        holding = true
+        action()
+        task.delay(0.3, function()
+            while holding do
+                action()
+                task.wait(0.15)
+            end
+        end)
+    end)
+    button.MouseButton1Up:Connect(function()
+        holding = false
+    end)
+    button.MouseLeave:Connect(function()
+        holding = false
+    end)
+end
+
+-- ปุ่มลดขนาด Hitbox (-1)
+local MinusBtn = Instance.new("TextButton")
+MinusBtn.Size = UDim2.new(0, 105, 0, 28)
+MinusBtn.Position = UDim2.new(0.5, -110, 0, 170)
+MinusBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MinusBtn.BorderSizePixel = 1
+MinusBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+MinusBtn.Text = "- Size"
+MinusBtn.TextScaled = true
+MinusBtn.Font = Enum.Font.SourceSansBold
+MinusBtn.Parent = ContainerMain
+applyRainbow(MinusBtn)
+
+setupHoldButton(MinusBtn, function()
+    hitboxSize = math.max(2, hitboxSize - 1)
+    HitboxSizeLabel.Text = "Hitbox Size: " .. hitboxSize
+end)
+
+-- ปุ่มเพิ่มขนาด Hitbox (+1)
+local PlusBtn = Instance.new("TextButton")
+PlusBtn.Size = UDim2.new(0, 105, 0, 28)
+PlusBtn.Position = UDim2.new(0.5, 5, 0, 170)
+PlusBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+PlusBtn.BorderSizePixel = 1
+PlusBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+PlusBtn.Text = "+ Size"
+PlusBtn.TextScaled = true
+PlusBtn.Font = Enum.Font.SourceSansBold
+PlusBtn.Parent = ContainerMain
+applyRainbow(PlusBtn)
+
+setupHoldButton(PlusBtn, function()
+    hitboxSize = hitboxSize + 1
+    HitboxSizeLabel.Text = "Hitbox Size: " .. hitboxSize
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not hitboxActive then return end
+    pcall(function()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local char = player.Character
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hrp and hum and hum.Health > 0 then
+                    hrp.Size = Vector3.new(hitboxSize, hitboxSize, hitboxSize)
+                    hrp.Transparency = 0.7
+                    hrp.CanCollide = false
+                end
+            end
+        end
+    end)
+end)
+
+
+----------------------------------------------------
+-- เนื้อหาในแท็บ LOCAL PLAYER
+----------------------------------------------------
+
+-- ปรับความเร็ว (WalkSpeed)
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(0, 220, 0, 20)
+SpeedLabel.Position = UDim2.new(0.5, -110, 0, 5)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Text = "WalkSpeed:"
+SpeedLabel.TextScaled = true
+SpeedLabel.Font = Enum.Font.SourceSansBold
+SpeedLabel.Parent = ContainerPlayer
+applyRainbow(SpeedLabel)
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Size = UDim2.new(0, 220, 0, 28)
+SpeedBox.Position = UDim2.new(0.5, -110, 0, 27)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SpeedBox.BorderSizePixel = 1
+SpeedBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.Text = "16"
+SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.TextScaled = true
+SpeedBox.Font = Enum.Font.SourceSansBold
+SpeedBox.Parent = ContainerPlayer
+
+SpeedBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local val = tonumber(SpeedBox.Text)
+        if val then
+            pcall(function()
+                LocalPlayer.Character.Humanoid.WalkSpeed = val
+            end)
+        end
+    end
+end)
+
+-- ปรับกระโดดสูง (JumpPower)
+local JumpLabel = Instance.new("TextLabel")
+JumpLabel.Size = UDim2.new(0, 220, 0, 20)
+JumpLabel.Position = UDim2.new(0.5, -110, 0, 60)
+JumpLabel.BackgroundTransparency = 1
+JumpLabel.Text = "JumpPower:"
+JumpLabel.TextScaled = true
+JumpLabel.Font = Enum.Font.SourceSansBold
+JumpLabel.Parent = ContainerPlayer
+applyRainbow(JumpLabel)
+
+local JumpBox = Instance.new("TextBox")
+JumpBox.Size = UDim2.new(0, 220, 0, 28)
+JumpBox.Position = UDim2.new(0.5, -110, 0, 82)
+JumpBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+JumpBox.BorderSizePixel = 1
+JumpBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+JumpBox.Text = "50"
+JumpBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+JumpBox.TextScaled = true
+JumpBox.Font = Enum.Font.SourceSansBold
+JumpBox.Parent = ContainerPlayer
+
+JumpBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local val = tonumber(JumpBox.Text)
+        if val then
+            pcall(function()
+                local hum = LocalPlayer.Character.Humanoid
+                hum.UseJumpPower = true
+                hum.JumpPower = val
+            end)
+        end
+    end
+end)
+
+-- อินฟินิตี้จั้ม (Infinite Jump)
+local InfJumpBtn = Instance.new("TextButton")
+InfJumpBtn.Size = UDim2.new(0, 220, 0, 30)
+InfJumpBtn.Position = UDim2.new(0.5, -110, 0, 117)
+InfJumpBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+InfJumpBtn.BorderSizePixel = 1
+InfJumpBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+InfJumpBtn.Text = "Infinite Jump: OFF"
+InfJumpBtn.TextScaled = true
+InfJumpBtn.Font = Enum.Font.SourceSansBold
+InfJumpBtn.Parent = ContainerPlayer
+applyRainbow(InfJumpBtn)
+
+local infJumpActive = false
+InfJumpBtn.MouseButton1Click:Connect(function()
+    infJumpActive = not infJumpActive
+    InfJumpBtn.Text = infJumpActive and "Infinite Jump: ON" or "Infinite Jump: OFF"
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if infJumpActive then
+        pcall(function()
+            LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidState.Jumping)
+        end)
+    end
+end)
+
+-- กาวิตี้จั้ม (Low Gravity)
+local GravityBtn = Instance.new("TextButton")
+GravityBtn.Size = UDim2.new(0, 220, 0, 30)
+GravityBtn.Position = UDim2.new(0.5, -110, 0, 152)
+GravityBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+GravityBtn.BorderSizePixel = 1
+GravityBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+GravityBtn.Text = "Low Gravity: OFF"
+GravityBtn.TextScaled = true
+GravityBtn.Font = Enum.Font.SourceSansBold
+GravityBtn.Parent = ContainerPlayer
+applyRainbow(GravityBtn)
+
+local gravityActive = false
+GravityBtn.MouseButton1Click:Connect(function()
+    gravityActive = not gravityActive
+    GravityBtn.Text = gravityActive and "Low Gravity: ON" or "Low Gravity: OFF"
+    Workspace.Gravity = gravityActive and 50 or 196.2
+end)
+
+-- ทะลุกำแพง (Noclip)
+local NoclipBtn = Instance.new("TextButton")
+NoclipBtn.Size = UDim2.new(0, 220, 0, 30)
+NoclipBtn.Position = UDim2.new(0.5, -110, 0, 187)
+NoclipBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+NoclipBtn.BorderSizePixel = 1
+NoclipBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+NoclipBtn.Text = "Noclip: OFF"
+NoclipBtn.TextScaled = true
+NoclipBtn.Font = Enum.Font.SourceSansBold
+NoclipBtn.Parent = ContainerPlayer
+applyRainbow(NoclipBtn)
+
+local noclipActive = false
+NoclipBtn.MouseButton1Click:Connect(function()
+    noclipActive = not noclipActive
+    NoclipBtn.Text = noclipActive and "Noclip: ON" or "Noclip: OFF"
+end)
+
+RunService.Stepped:Connect(function()
+    if noclipActive then
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in pairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+----------------------------------------------------
+-- เครดิตด้านล่าง UI และ ปุ่มย่อ UI
+----------------------------------------------------
+
+local CreditLabel = Instance.new("TextLabel")
+CreditLabel.Size = UDim2.new(1, 0, 0, 20)
+CreditLabel.Position = UDim2.new(0, 0, 1, -22)
+CreditLabel.BackgroundTransparency = 1
+CreditLabel.Text = "By Axom"
+CreditLabel.TextScaled = true
+CreditLabel.Font = Enum.Font.SourceSans
+CreditLabel.Parent = MainFrame
+applyRainbow(CreditLabel)
+
+-- ปุ่มย่อ UI (Minimize Button) เป็นตัว A สีขาว และลากเลื่อนได้
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleMinimize"
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Position = UDim2.new(0, 40, 0, 40)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.BorderSizePixel = 2
+ToggleButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Text = "A"
+ToggleButton.TextScaled = true
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Parent = ScreenGui
+
+-- ระบบลากเลื่อนปุ่มย่อ UI
+local dragging, dragInput, dragStart, startPos
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleButton.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        ToggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- ควบคุมการเปิด/ปิดหน้าต่างหลักเมื่อกดปุ่มย่อ
+local isMinimized = false
+ToggleButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    MainFrame.Visible = not isMinimized
+end)
